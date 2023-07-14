@@ -1,10 +1,9 @@
 <template>
   <el-container class="main">
-    <el-aside width="200px">
+    <el-aside width="200px" class="siderbar">
       <el-row class="tac" style="height: 100%">
         <el-col style="height: 100%">
           <el-menu
-            default-active="2"
             class="el-menu-vertical-demo"
             @open="handleOpen"
             @close="handleClose"
@@ -12,32 +11,47 @@
             text-color="#fff"
             active-text-color=" #43a7fe"
             style="height: 100%"
+            :default-active="this.$route.path"
+            router
           >
             <el-menu-item index="0" class="logo">
               <img src="@/assets/common/logo.png" class="sidebar-logo" />
               <span slot="title">人力资源管理系统</span>
             </el-menu-item>
-            <el-menu-item index="2">
+            <el-menu-item index="/home">
               <i class="el-icon-menu"></i>
               <span slot="title">主页</span>
             </el-menu-item>
-            <el-menu-item index="1">
-              <i class="el-icon-menu"></i>
-              <span slot="title">变动申请</span>
-            </el-menu-item>
-            <el-menu-item index="0">
+            <el-submenu index="/changeRequest">
+              <template slot="title">
+                <i class="el-icon-menu"></i>
+                <span>变更申请</span>
+              </template>
+              <el-menu-item-group>
+                <el-menu-item index="/changeRequest/userInfo"
+                  >基本信息管理</el-menu-item
+                >
+                <el-menu-item index="/changeRequest/leave"
+                  >离职/退休申请</el-menu-item
+                >
+                <el-menu-item index="/changeRequest/transfer"
+                  >部门调动申请</el-menu-item
+                >
+              </el-menu-item-group>
+            </el-submenu>
+            <el-menu-item index="/handle">
               <i class="el-icon-menu"></i>
               <span slot="title">员工申请处理</span>
             </el-menu-item>
-            <el-menu-item index="3">
+            <el-menu-item index="/infoManage">
               <i class="el-icon-menu"></i>
               <span slot="title">员工信息管理</span>
             </el-menu-item>
-            <el-menu-item index="4">
+            <el-menu-item index="/attendanceManage">
               <i class="el-icon-menu"></i>
               <span slot="title">考勤管理</span>
             </el-menu-item>
-            <el-menu-item index="5">
+            <el-menu-item index="/salaryManage">
               <i class="el-icon-menu"></i>
               <span slot="title">工资管理</span>
             </el-menu-item>
@@ -83,68 +97,8 @@
           </div>
         </span>
       </el-header>
-      <el-container class="show">
-        <el-header class="hello" style="height: 130px">
-          <img src="@/assets/common/hello.png" class="hello-img" />
-          <span style="color:#3d3f42">你好，王孖骏，祝你开心每一天！</span>
-        </el-header>
-        <el-container>
-          <el-aside class="calendar">
-            <el-header class="calendar-title">
-              <div>工作日历</div>
-              <el-divider></el-divider>
-            </el-header>
-            <el-calendar v-model="value" style="margin-top: 55px">
-            </el-calendar>
-          </el-aside>
-          <el-aside class="news">
-            <div class="title">NEWS</div>
-            
-            <div class="news-body">
-              <div class="news-item">
-                <img src="../assets/common/fire.png" class="fire" />
-                <a href="https://weibo.com/5242381821/N9NgEbkXQ"
-                  >《奔跑吧》停播两周后宣布今晚播出</a
-                >
-              </div>
-              <div class="news-item">
-                <img src="../assets/common/fire.png" class="fire" />
-                <a
-                  href="https://baijiahao.baidu.com/s?id=1769742840089247667&wfr=spider&for=pc"
-                  >知情人：蔡徐坤一夜情致女方怀孕</a
-                >
-              </div>
-              <div class="news-item">
-                <img src="../assets/common/fire.png" class="fire" />
-                <a
-                  href="https://baijiahao.baidu.com/s?id=1731154258505903878&wfr=spider&for=pc"
-                  >全国最“穷”的211大学，却敢直接叫板北大，获得网友一致好评</a
-                >
-              </div>
-              <div class="news-item">
-                <img src="../assets/common/fire.png" class="fire" />
-                <a
-                  href="https://haokan.baidu.com/v?pd=wisenatural&vid=2398929855405388087"
-                  >知名旅行博主在新疆徒步失联后遇难</a
-                >
-              </div>
-              <div class="news-item">
-                <img src="../assets/common/fire.png" class="fire" />
-                <a
-                  href="https://baijiahao.baidu.com/s?id=1771354268903593237&wfr=spider&for=pc"
-                  >世卫正式宣布：阿斯巴甜可能致癌！</a
-                >
-              </div>
-              <div class="news-item" style="border: 0">
-                <img src="../assets/common/fire.png" class="fire" />
-                <a href="https://baijiahao.baidu.com/s?id=1771279085130349560"
-                  >3中国公民在马代溺亡1人被鲨鱼咬伤</a
-                >
-              </div>
-            </div>
-          </el-aside>
-        </el-container>
-      </el-container>
+      <!-- 二级路由挂载点 -->
+      <router-view></router-view>
     </el-container>
   </el-container>
 </template>
@@ -160,6 +114,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .main {
   position: relative;
   height: 100vh;
@@ -300,6 +255,11 @@ export default {
 
 .el-menu {
   border: 0;
+  
+}
+
+::v-deep .el-submenu__title i {
+  color: #fff !important;
 }
 
 .hello {
