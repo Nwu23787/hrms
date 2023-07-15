@@ -102,6 +102,7 @@ export default {};
 
   .calendar-title {
     position: fixed;
+    z-index:1;
     font-size: 25px;
     background-color: #fff;
     width: 40%;

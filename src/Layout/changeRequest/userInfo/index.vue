@@ -40,17 +40,14 @@
           <el-input v-model="form.id" disabled></el-input>
         </el-col>
       </el-form-item>
-      <el-form-item label="时薪">
-        <el-col :span="8">
-          <el-input v-model="form.salary" disabled></el-input>
-        </el-col>
-      </el-form-item>
       <el-form-item label="工作时间">
         <el-col :span="8">
           <el-input v-model="form.time" disabled></el-input>
         </el-col>
       </el-form-item>
-
+      <el-form-item label="变更原因" required>
+        <el-input type="textarea" v-model="form.reason"></el-input>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">立即提交</el-button>
         <el-button>取消</el-button>
@@ -71,7 +68,6 @@ export default {
         department: "caiwu",
         post: "经理",
         id: "990101",
-        salary: 3000,
         time: 30,
       },
     };
