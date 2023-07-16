@@ -15,7 +15,7 @@ router.beforeEach((to, from, next) => {
         } else {
             console.log(to.path);
             //要访问的是主页、申请页和404页面，放行
-            if (to.path === '/home' || to.path === '/changeRequest' || to.path === '/404') {
+            if (to.path === '/home' || to.path === '/changeRequest/leave' ||to.path === '/changeRequest/userInfo'||to.path === '/changeRequest/transfer' || to.path === '/404') {
                 next()
             } else {
                 // 访问的管理员权限页
