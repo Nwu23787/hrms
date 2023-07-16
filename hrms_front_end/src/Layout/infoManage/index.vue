@@ -4,15 +4,17 @@
     <el-button @click="resetDepFilter">清除部门筛选</el-button>
     <el-button @click="resetPostFilter">清除职位筛选</el-button>
     <el-button @click="clearFilter">清除所有筛选</el-button>
+    <el-button type="primary" @click="handleDownload">导出表格</el-button>
     <el-table
       ref="filterTable"
       :data="tableData"
       style="width: 100%"
       max-height="640"
+      id="out-table"
     >
-      <el-table-column prop="id" label="工号" sortable width="150">
+      <el-table-column prop="id" label="工号" sortable width="135">
       </el-table-column>
-      <el-table-column prop="name" label="姓名" width="150"> </el-table-column>
+      <el-table-column prop="name" label="姓名" width="135"> </el-table-column>
       <el-table-column
         prop="sex"
         label="性别"
@@ -23,19 +25,19 @@
         :filter-method="filterSex"
         filter-placement="bottom-end"
         column-key="sex"
-        width="150"
+        width="135"
       >
       </el-table-column>
       <el-table-column
         prop="age"
         label="年龄"
         sortable
-        width="150"
+        width="135"
       ></el-table-column>
       <el-table-column
         prop="department"
         label="部门"
-        width="150"
+        width="135"
         column-key="department"
         :filters="[
           { text: '营销部', value: '营销部' },
@@ -49,7 +51,7 @@
       <el-table-column
         prop="post"
         label="职位"
-        width="150"
+        width="135"
         :filters="[
           { text: '经理', value: '经理' },
           { text: '员工', value: '员工' },
@@ -62,16 +64,16 @@
         prop="salary"
         label="时薪（元）"
         sortable
-        width="150"
+        width="135"
       ></el-table-column>
       <el-table-column
         prop="time"
         label="本月工作时长"
         sortable
-        width="150"
+        width="135"
       ></el-table-column>
       <!-- 操作按钮 -->
-      <el-table-column label="操作" width="150" fixed="right">
+      <el-table-column label="操作" width="135">
         <template slot-scope="scope">
           <el-button type="danger" size="mini" @click="alterInfo(scope.row)"
             >修改</el-button
@@ -138,6 +140,8 @@
 
 <script>
 import { getStaffInfoList, updateStaffInfo } from "@/api";
+import FileSaver from "file-saver";
+const XLSX = require("xlsx");
 export default {
   data() {
     return {
@@ -160,6 +164,35 @@ export default {
     }
   },
   methods: {
+    //导出文件
+    handleDownload() {
+      /* 从表生成工作簿对象 */
+      var wb = XLSX.utils.table_to_book(document.querySelector("#out-table"));
+      //删除操作列
+      for (let prop in wb.Sheets.Sheet1) {
+        if (prop.startsWith("I")) {
+          delete wb.Sheets.Sheet1[prop];
+        }
+      }
+      /* 获取二进制字符串作为输出 */
+      var wbout = XLSX.write(wb, {
+        bookType: "xlsx",
+        bookSST: true,
+        type: "array",
+      });
+      try {
+        FileSaver.saveAs(
+          //返回一个新创建的 Blob 对象，其内容由参数中给定的数组串联组成。
+          new Blob([wbout], { type: "application/octet-stream" }),
+          //设置导出文件名称
+          "员工信息表.xlsx"
+        );
+      } catch (e) {
+        if (typeof console !== "undefined") console.log(e, wbout);
+      }
+      return wbout;
+    },
+
     //确认修改
     async confirmUpdate() {
       try {

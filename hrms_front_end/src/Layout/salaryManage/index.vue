@@ -23,6 +23,14 @@
             :max="200"
           ></el-input-number>
         </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            @click="handleDownload"
+            style="margin-left: 80px"
+            >导出表格</el-button
+          >
+        </el-form-item>
       </el-form>
     </div>
 
@@ -33,6 +41,7 @@
         :data="tableData"
         style="width: 100%"
         max-height="510"
+        id="out-table"
         :key="Math.random()"
       >
         <el-table-column prop="id" label="工号" sortable width="134">
@@ -78,6 +87,8 @@
 
 <script>
 import { getMonthInfo } from "@/api";
+import FileSaver from "file-saver";
+const XLSX = require("xlsx");
 export default {
   data() {
     return {
@@ -137,6 +148,30 @@ export default {
     } catch (error) {
       console.log(error);
     }
+  },
+  methods: {
+    //导出文件
+    handleDownload() {
+      /* 从表生成工作簿对象 */
+      var wb = XLSX.utils.table_to_book(document.querySelector("#out-table"));
+      /* 获取二进制字符串作为输出 */
+      var wbout = XLSX.write(wb, {
+        bookType: "xlsx",
+        bookSST: true,
+        type: "array",
+      });
+      try {
+        FileSaver.saveAs(
+          //返回一个新创建的 Blob 对象，其内容由参数中给定的数组串联组成。
+          new Blob([wbout], { type: "application/octet-stream" }),
+          //设置导出文件名称
+          "员工工资表.xlsx"
+        );
+      } catch (e) {
+        if (typeof console !== "undefined") console.log(e, wbout);
+      }
+      return wbout;
+    },
   },
 };
 </script>

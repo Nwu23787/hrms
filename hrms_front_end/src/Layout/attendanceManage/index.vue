@@ -23,6 +23,9 @@
               @click="filterData"
               >筛选</el-button
             >
+            <el-button type="primary" @click="handleDownload" size="small"
+              >导出表格</el-button
+            >
           </el-checkbox-group>
         </el-form-item>
       </el-form>
@@ -36,6 +39,7 @@
         style="width: 100%"
         max-height="510"
         :key="Math.random()"
+        id="out-table"
       >
         <el-table-column prop="id" label="工号" sortable width="134">
         </el-table-column>
@@ -132,6 +136,8 @@
 
 <script>
 import { getAttendanceInfo, updateAttendance } from "@/api";
+import FileSaver from "file-saver";
+const XLSX = require("xlsx");
 export default {
   data() {
     return {
@@ -150,6 +156,44 @@ export default {
     };
   },
   methods: {
+    //导出文件
+    handleDownload() {
+      /* 从表生成工作簿对象 */
+      var wb = XLSX.utils.table_to_book(document.querySelector("#out-table"));
+      //删除操作列
+      for (let prop in wb.Sheets.Sheet1) {
+        if (prop.startsWith("I")) {
+          delete wb.Sheets.Sheet1[prop];
+        }
+      }
+      /* 获取二进制字符串作为输出 */
+      var wbout = XLSX.write(wb, {
+        bookType: "xlsx",
+        bookSST: true,
+        type: "array",
+      });
+      try {
+        if (this.formData.department.length !== 0) {
+          FileSaver.saveAs(
+            //返回一个新创建的 Blob 对象，其内容由参数中给定的数组串联组成。
+            new Blob([wbout], { type: "application/octet-stream" }),
+            //设置导出文件名称
+            `${this.formData.day}号${this.formData.department}考勤表.xlsx`
+          );
+        } else {
+          FileSaver.saveAs(
+            //返回一个新创建的 Blob 对象，其内容由参数中给定的数组串联组成。
+            new Blob([wbout], { type: "application/octet-stream" }),
+            //设置导出文件名称
+            `${this.formData.day}号营销部、技术部、财务部、人事部考勤表.xlsx`
+          );
+        }
+      } catch (e) {
+        if (typeof console !== "undefined") console.log(e, wbout);
+      }
+      return wbout;
+    },
+
     showDetails(value) {
       this.dialogForm = value;
       this.clickID = value.id;

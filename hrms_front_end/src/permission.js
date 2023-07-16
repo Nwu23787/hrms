@@ -15,14 +15,15 @@ router.beforeEach((to, from, next) => {
         } else {
             console.log(to.path);
             //要访问的是主页、申请页和404页面，放行
-            if (to.path === '/home' || to.path === '/changeRequest/leave' ||to.path === '/changeRequest/userInfo'||to.path === '/changeRequest/transfer' || to.path === '/404') {
+            if (to.path === '/home' || to.path === '/changeRequest/leave' || to.path === '/changeRequest/userInfo' || to.path === '/changeRequest/transfer' || to.path === '/404') {
                 next()
             } else {
                 // 访问的管理员权限页
                 //判断用户是否具有管理员权限
                 console.log(store.state.isAdmin);
-                if (store.state.isAdmin === true) {
+                if (store.state.isAdmin === 'true' || store.state.isAdmin === true) {
                     //有管理员权限，放行
+                    console.log(11);
                     next()
                 } else {
                     //该用户不是管理员，拦截
