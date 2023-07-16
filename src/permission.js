@@ -1,25 +1,34 @@
-//路由守卫
 import router from '@/router'
 import store from '@/store'
-import NProgress from 'nprogress' // 引入一份进度条插件
-import 'nprogress/nprogress.css' // 引入进度条样式'
 
 //设置白名单页面
 const whiteList = ['/login', '/404']
 
 //前置路由守卫 
 router.beforeEach((to, from, next) => {
-    //开始进度条
-    NProgress.start()
     //跳转前判断是否有token
-    if (store.getters.token) {
+    if (store.state.token) {
         //判断跳转的是否是登录页
         if (to.path === '/login') {
             //跳转主页
             next('/')
         } else {
-            //要访问的不是登录页，放行
-            next()
+            console.log(to.path);
+            //要访问的是主页、申请页和404页面，放行
+            if (to.path === '/home' || to.path === '/changeRequest' || to.path === '/404') {
+                next()
+            } else {
+                // 访问的管理员权限页
+                //判断用户是否具有管理员权限
+                console.log(store.state.isAdmin);
+                if (store.state.isAdmin === true) {
+                    //有管理员权限，放行
+                    next()
+                } else {
+                    //该用户不是管理员，拦截
+                    next('/404')
+                }
+            }
         }
     } else {
         //没有token
@@ -32,9 +41,6 @@ router.beforeEach((to, from, next) => {
             next('/login')//跳转登录页
         }
     }
-    NProgress.done()
 })
 //后置路由守卫
-router.afterEach(
-    NProgress.done()
-)
+router.afterEach()

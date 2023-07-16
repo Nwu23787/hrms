@@ -2,7 +2,12 @@
   <div class="main">
     <div class="title">员工信息</div>
     <el-divider></el-divider>
-    <el-form ref="form" :model="form" label-width="80px">
+    <el-form
+      ref="userInfoForm"
+      :rules="userInfoRules"
+      :model="form"
+      label-width="80px"
+    >
       <el-form-item label="姓名">
         <el-col :span="8">
           <el-input v-model="form.name"></el-input>
@@ -17,7 +22,6 @@
       <el-form-item label="年龄">
         <el-input-number
           v-model="form.age"
-          @change="handleChange"
           :min="1"
           :max="100"
         ></el-input-number>
@@ -45,7 +49,7 @@
           <el-input v-model="form.time" disabled></el-input>
         </el-col>
       </el-form-item>
-      <el-form-item label="变更原因" required>
+      <el-form-item label="变更原因" prop="reason">
         <el-input type="textarea" v-model="form.reason"></el-input>
       </el-form-item>
       <el-form-item>
@@ -57,25 +61,48 @@
 </template>
 
 <script>
+import { getInfo, updateInfo } from "@/api";
 export default {
   data() {
     return {
       //表单数据
-      form: {
-        name: "小骏",
-        sex: "男",
-        age: 18,
-        department: "caiwu",
-        post: "经理",
-        id: "990101",
-        time: 30,
+      form: {},
+      //验证规则
+      userInfoRules: {
+        reason: [
+          { required: true, trigger: "blur", message: "变更原因不能为空" },
+        ],
       },
     };
   },
   methods: {
     onSubmit() {
       console.log("submit!");
+      this.$refs.userInfoForm.validate(async (isOk) => {
+        if (isOk) {
+          try {
+            const res = await updateInfo({
+              name: this.form.name,
+              sex: this.form.sex,
+              age: this.form.age,
+              reason: this.form.reason,
+            });
+            this.$message({
+              message: "提交成功",
+              type: "success",
+            });
+            console.log(res);
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      });
     },
+  },
+  async created() {
+    const result = await getInfo({ id: this.$store.state.id });
+    result.reason = "";
+    this.form = result;
   },
 };
 </script>

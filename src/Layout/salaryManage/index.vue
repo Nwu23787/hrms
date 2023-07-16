@@ -77,6 +77,7 @@
 </template>
 
 <script>
+import { getMonthInfo } from "@/api";
 export default {
   data() {
     return {
@@ -97,136 +98,6 @@ export default {
           sumOverTime: 13, //加班时间
           absentTime: 0, //旷工时间
         },
-        {
-          id: 990001,
-          name: "大骏马",
-          department: "营销部",
-          post: "经理",
-          salary: 30,
-          sumWorkTime: 111, //上班时间
-          sumOverTime: 42, //加班时间
-          absentTime: 11, //旷工时间
-        },
-        {
-          id: 990001,
-          name: "大骏马",
-          department: "营销部",
-          post: "经理",
-          salary: 30,
-          sumWorkTime: 52, //上班时间
-          sumOverTime: 44, //加班时间
-          absentTime: 18, //旷工时间
-        },
-        {
-          id: 990001,
-          name: "大骏马",
-          department: "营销部",
-          post: "经理",
-          salary: 30,
-          sumWorkTime: 67, //上班时间
-          sumOverTime: 0, //加班时间
-          absentTime: 100, //旷工时间
-        },
-        {
-          id: 990001,
-          name: "大骏马",
-          department: "营销部",
-          post: "经理",
-          salary: 30,
-          sumWorkTime: 12, //上班时间
-          sumOverTime: 9, //加班时间
-          absentTime: 1, //旷工时间
-        },
-        {
-          id: 990001,
-          name: "大骏马",
-          department: "营销部",
-          post: "经理",
-          salary: 30,
-          sumWorkTime: 33, //上班时间
-          sumOverTime: 14, //加班时间
-          absentTime: 5, //旷工时间
-        },
-                {
-          id: 990001,
-          name: "大骏马",
-          department: "营销部",
-          post: "经理",
-          salary: 30,
-          sumWorkTime: 52, //上班时间
-          sumOverTime: 44, //加班时间
-          absentTime: 18, //旷工时间
-        },
-        {
-          id: 990001,
-          name: "大骏马",
-          department: "营销部",
-          post: "经理",
-          salary: 30,
-          sumWorkTime: 67, //上班时间
-          sumOverTime: 0, //加班时间
-          absentTime: 100, //旷工时间
-        },
-        {
-          id: 990001,
-          name: "大骏马",
-          department: "营销部",
-          post: "经理",
-          salary: 30,
-          sumWorkTime: 12, //上班时间
-          sumOverTime: 9, //加班时间
-          absentTime: 1, //旷工时间
-        },
-        {
-          id: 990001,
-          name: "大骏马",
-          department: "营销部",
-          post: "经理",
-          salary: 30,
-          sumWorkTime: 33, //上班时间
-          sumOverTime: 14, //加班时间
-          absentTime: 5, //旷工时间
-        },
-                {
-          id: 990001,
-          name: "大骏马",
-          department: "营销部",
-          post: "经理",
-          salary: 30,
-          sumWorkTime: 52, //上班时间
-          sumOverTime: 44, //加班时间
-          absentTime: 18, //旷工时间
-        },
-        {
-          id: 990001,
-          name: "大骏马",
-          department: "营销部",
-          post: "经理",
-          salary: 30,
-          sumWorkTime: 67, //上班时间
-          sumOverTime: 0, //加班时间
-          absentTime: 100, //旷工时间
-        },
-        {
-          id: 990001,
-          name: "大骏马",
-          department: "营销部",
-          post: "经理",
-          salary: 30,
-          sumWorkTime: 12, //上班时间
-          sumOverTime: 9, //加班时间
-          absentTime: 1, //旷工时间
-        },
-        {
-          id: 990001,
-          name: "大骏马",
-          department: "营销部",
-          post: "经理",
-          salary: 30,
-          sumWorkTime: 33, //上班时间
-          sumOverTime: 14, //加班时间
-          absentTime: 5, //旷工时间
-        },
       ],
     };
   },
@@ -244,7 +115,7 @@ export default {
           value.sumOverTime * this.formData.overTimeSalary;
         //总旷工罚款
         value.sumAbsentTimeSalary =
-          value.absentTime * this.formData.absentTimeSalary;
+          value.sumAbsentTime * this.formData.absentTimeSalary;
         //本月总工资,工资最低为0
         value.sumSalary =
           value.sumBaseSalary +
@@ -258,6 +129,14 @@ export default {
       });
       return arr;
     },
+  },
+  async created() {
+    try {
+      const result = await getMonthInfo();
+      this.userData = result;
+    } catch (error) {
+      console.log(error);
+    }
   },
 };
 </script>

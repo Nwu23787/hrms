@@ -32,7 +32,7 @@
         width="200"
       ></el-table-column>
       <el-table-column
-        prop="tag"
+        prop="type"
         label="申请类型"
         sortable
         width="200"
@@ -42,21 +42,25 @@
           { text: '退休', value: '退休' },
           { text: '调动', value: '调动' },
         ]"
-        column-key="tag"
+        column-key="type"
         :filter-method="filterTag"
         filter-placement="bottom-end"
       >
         <template slot-scope="scope">
-          <el-tag :type="whichType(scope.row.tag)" disable-transitions>{{
-            scope.row.tag
+          <el-tag :type="whichType(scope.row.type)" disable-transitions>{{
+            scope.row.type
           }}</el-tag>
         </template>
       </el-table-column>
 
       <el-table-column label="操作" width="300">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini">批准</el-button>
-          <el-button type="success" size="mini">拒绝</el-button>
+          <el-button type="primary" size="mini" @click="permission(scope.row)"
+            >批准</el-button
+          >
+          <el-button type="success" size="mini" @click="reject(scope.row)"
+            >拒绝</el-button
+          >
           <el-button type="info" size="mini" @click="showDetails(scope.row)"
             >详情</el-button
           >
@@ -78,132 +82,65 @@
 </template>
 
 <script>
+import { getRequestList, handleRequest } from "@/api";
 export default {
   data() {
     return {
       //弹出框内容
       reason: "",
-      tableData: [
-        {
-          id: "93942",
-          name: "王小骏",
-          sex: "男",
-          age: 18,
-          tag: "调动",
-          reason:
-            "7月12日上午，在位于西安市东仪路的荣安芙蓉印月小区门口，姬女士告诉记者，自己2020年购买了该小区1号楼一套商业公寓，因疫情原因推迟到今年3月份交房，但至今自己并没有收房，就是想不通为啥公摊面积这么高。根据姬女士提供的购房合同，出卖人为西安康翰置业有限责任公司，该商品房的房产测绘机构为西安市房产测量事务所有限公司，预（实）测建筑面积共69.75平方米，其中套内建筑面积32.71平方米，分摊共有建筑面积37.04平方米。",
-        },
-        {
-          id: "27465",
-          name: "李小骏",
-          sex: "女",
-          age: 23,
-          tag: "信息变更",
-        },
-        {
-          id: "16098",
-          name: "赵小骏",
-          sex: "女",
-          age: 25,
-          tag: "离职",
-        },
-        {
-          id: "15647",
-          name: "孙小骏",
-          sex: "男",
-          age: 16,
-          tag: "退休",
-        },
-        {
-          id: "93942",
-          name: "王小骏",
-          sex: "男",
-          age: 18,
-          tag: "调动",
-        },
-        {
-          id: "27465",
-          name: "李小骏",
-          sex: "女",
-          age: 23,
-          tag: "信息变更",
-        },
-        {
-          id: "16098",
-          name: "赵小骏",
-          sex: "女",
-          age: 25,
-          tag: "离职",
-        },
-        {
-          id: "15647",
-          name: "孙小骏",
-          sex: "男",
-          age: 16,
-          tag: "退休",
-        },
-        {
-          id: "93942",
-          name: "王小骏",
-          sex: "男",
-          age: 18,
-          tag: "调动",
-        },
-        {
-          id: "27465",
-          name: "李小骏",
-          sex: "女",
-          age: 23,
-          tag: "信息变更",
-        },
-        {
-          id: "16098",
-          name: "赵小骏",
-          sex: "女",
-          age: 25,
-          tag: "离职",
-        },
-        {
-          id: "15647",
-          name: "孙小骏",
-          sex: "男",
-          age: 16,
-          tag: "退休",
-        },
-        {
-          id: "93942",
-          name: "王小骏",
-          sex: "男",
-          age: 18,
-          tag: "调动",
-        },
-        {
-          id: "27465",
-          name: "李小骏",
-          sex: "女",
-          age: 23,
-          tag: "信息变更",
-        },
-        {
-          id: "93942",
-          name: "王小骏",
-          sex: "男",
-          age: 18,
-          tag: "调动",
-        },
-        {
-          id: "27465",
-          name: "李小骏",
-          sex: "女",
-          age: 23,
-          tag: "信息变更",
-        },
-      ],
+      tableData: [],
       //控制弹出框
       dialogTableVisible: false,
     };
   },
   methods: {
+    //处理请求之后要重新获取请求列表，刷新页面
+    //批准员工请求
+    async permission(value) {
+      console.log(value);
+      try {
+        await handleRequest({ RID: value.RID, isPermission: true });
+        //提示成功
+        this.$message({
+          message: "已批准！",
+          type: "success",
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        //更新请求列表
+        try {
+          const result = await getRequestList();
+          this.tableData = result;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    },
+
+    //拒绝员工请求
+    async reject(value) {
+      console.log(value);
+      try {
+        await handleRequest({ RID: value.RID, isPermission: false });
+        //提示成功
+        this.$message({
+          message: "已拒绝！",
+          type: "success",
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        //更新请求列表
+        try {
+          const result = await getRequestList();
+          this.tableData = result;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    },
+
     resetSexFilter() {
       this.$refs.filterTable.clearFilter("sex");
     },
@@ -214,7 +151,7 @@ export default {
       this.$refs.filterTable.clearFilter("tag");
     },
     filterTag(value, row) {
-      return row.tag === value;
+      return row.type === value;
     },
     filterSex(value, row) {
       return row.sex === value;
@@ -239,6 +176,10 @@ export default {
       this.reason = value.reason;
       this.dialogTableVisible = true;
     },
+  },
+  async created() {
+    const result = await getRequestList();
+    this.tableData = result;
   },
 };
 </script>

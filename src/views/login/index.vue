@@ -5,26 +5,26 @@
       :model="loginForm"
       :rules="loginRules"
       class="login-form"
-      auto-complete="on"
+      auto-complete="off"
       label-position="left"
     >
       <div class="title-container">
         <h3 class="title">人力资源管理后台登录系统</h3>
       </div>
-      <el-form-item prop="mobile">
+      <el-form-item prop="username">
         <el-input
           ref="username"
-          v-model="loginForm.mobile"
-          placeholder="请输入手机号"
+          v-model="loginForm.username"
+          placeholder="请输入姓名"
           name="username"
           type="text"
           tabindex="1"
-          auto-complete="on"
+          auto-complete="off"
           prefix-icon="el-icon-user-solid"
         >
         </el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item prop="password">
         <el-input
           :key="passwordType"
           ref="password"
@@ -52,15 +52,50 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 export default {
   data() {
     return {
       //表单信息对象
       loginForm: {
-        mobile: "123456",
-        password: "888888",
+        username: "",
+        password: "",
+      },
+      loading: false,
+      passwordType: "password",
+      loginRules: {
+        username: [
+          { required: true, trigger: "blur", message: "姓名不能为空" },
+        ],
+        password: [
+          { required: true, trigger: "blur", message: "密码不能为空" },
+        ],
       },
     };
+  },
+  methods: {
+    ...mapActions(["login"]),
+    handleLogin() {
+      // 表单的手动校验
+      this.$refs.loginForm.validate(async (isOK) => {
+        if (isOK) {
+          try {
+            this.loading = true;
+            // 只有校验通过了 我们才去调用action
+            await this.login(this.loginForm);
+            // 应该登录成功之后
+            // async标记的函数实际上一个promise对象
+            // await下面的代码 都是成功执行的代码
+            this.$router.push("/");
+          } catch (error) {
+            console.log(error);
+          } finally {
+            //  不论执行try 还是catch  都去关闭转圈
+            this.loading = false;
+          }
+        }
+      });
+    },
   },
 };
 </script>

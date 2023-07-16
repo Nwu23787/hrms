@@ -2,7 +2,9 @@
   <el-container class="show">
     <el-header class="hello" style="height: 130px">
       <img src="@/assets/common/hello.png" class="hello-img" />
-      <span style="color: #3d3f42">你好，王孖骏，祝你开心每一天！</span>
+      <span style="color: #3d3f42"
+        >你好，{{ $store.state.username }}，祝你开心每一天！</span
+      >
     </el-header>
     <el-container>
       <el-aside class="calendar">
@@ -63,11 +65,16 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      value: new Date(),
+    };
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-
 .hello {
   position: relative;
   width: 94%;
@@ -102,7 +109,7 @@ export default {};
 
   .calendar-title {
     position: fixed;
-    z-index:1;
+    z-index: 1;
     font-size: 25px;
     background-color: #fff;
     width: 40%;

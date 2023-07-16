@@ -5,8 +5,6 @@
         <el-col style="height: 100%">
           <el-menu
             class="el-menu-vertical-demo"
-            @open="handleOpen"
-            @close="handleClose"
             background-color="#5788fe"
             text-color="#fff"
             active-text-color=" #43a7fe"
@@ -55,13 +53,9 @@
               <i class="el-icon-menu"></i>
               <span slot="title">工资管理</span>
             </el-menu-item>
-            <el-menu-item index="6">
+            <el-menu-item index="/systemManage">
               <i class="el-icon-menu"></i>
-              <span slot="title">报表管理</span>
-            </el-menu-item>
-            <el-menu-item index="7">
-              <i class="el-icon-menu"></i>
-              <span slot="title">系统管理员</span>
+              <span slot="title">系统管理</span>
             </el-menu-item>
           </el-menu>
         </el-col>
@@ -79,14 +73,14 @@
                   src="@/assets/common/bigUserHeader.png"
                   class="user-avatar"
                 />
-                <span class="name"> 管理员 </span>
+                <span class="name"> {{ $store.state.username }} </span>
                 <i class="el-icon-caret-bottom" />
               </div>
               <el-dropdown-menu slot="dropdown" class="user-dropdown">
                 <router-link to="/">
                   <el-dropdown-item> 首页 </el-dropdown-item>
                 </router-link>
-                <a target="_blank" href="https://github.com/Nwu23787/HRsaas">
+                <a target="_blank" href="https://github.com/Nwu23787/hrms">
                   <el-dropdown-item>项目地址</el-dropdown-item>
                 </a>
                 <el-dropdown-item divided @click.native="logout">
@@ -106,15 +100,19 @@
 <script>
 export default {
   data() {
-    return {
-      value: new Date(),
-    };
+    return {};
+  },
+  methods: {
+    //登出
+    async logout() {
+      await this.$store.dispatch("logout"); // 这里不论写不写 await 登出方法都是同步的
+      this.$router.push(`/login`); // 跳到登录
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-
 .main {
   position: relative;
   height: 100vh;
@@ -255,7 +253,6 @@ export default {
 
 .el-menu {
   border: 0;
-  
 }
 
 ::v-deep .el-submenu__title i {

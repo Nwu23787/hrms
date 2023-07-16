@@ -130,148 +130,56 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogTableVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogTableVisible = false"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="confirmUpdate">确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import { getStaffInfoList, updateStaffInfo } from "@/api";
 export default {
   data() {
     return {
-      //弹出框内容
-      tableData: [
-        {
-          id: "93942",
-          name: "王小骏",
-          sex: "男",
-          age: 18,
-          department: "营销部",
-          post: "员工",
-          time: 300,
-          salary: 20,
-        },
-        {
-          id: "27465",
-          name: "李小骏",
-          sex: "女",
-          age: 23,
-          department: "技术部",
-          post: "经理",
-          time: 1150,
-          salary: 100,
-        },
-        {
-          id: "93942",
-          name: "王小骏",
-          sex: "男",
-          age: 18,
-          department: "营销部",
-          post: "员工",
-          time: 300,
-          salary: 20,
-        },
-        {
-          id: "27465",
-          name: "李小骏",
-          sex: "女",
-          age: 23,
-          department: "技术部",
-          post: "经理",
-          time: 1150,
-          salary: 100,
-        },
-        {
-          id: "93942",
-          name: "王小骏",
-          sex: "男",
-          age: 18,
-          department: "营销部",
-          post: "员工",
-          time: 300,
-          salary: 20,
-        },
-        {
-          id: "27465",
-          name: "李小骏",
-          sex: "女",
-          age: 23,
-          department: "技术部",
-          post: "经理",
-          time: 1150,
-          salary: 100,
-        },
-        {
-          id: "93942",
-          name: "王小骏",
-          sex: "男",
-          age: 18,
-          department: "营销部",
-          post: "员工",
-          time: 300,
-          salary: 20,
-        },
-        {
-          id: "27465",
-          name: "李小骏",
-          sex: "女",
-          age: 23,
-          department: "技术部",
-          post: "经理",
-          time: 1150,
-          salary: 100,
-        },
-        {
-          id: "93942",
-          name: "王小骏",
-          sex: "男",
-          age: 18,
-          department: "营销部",
-          post: "员工",
-          time: 300,
-          salary: 20,
-        },
-        {
-          id: "27465",
-          name: "李小骏",
-          sex: "女",
-          age: 23,
-          department: "技术部",
-          post: "经理",
-          time: 1150,
-          salary: 100,
-        },
-        {
-          id: "93942",
-          name: "王小骏",
-          sex: "男",
-          age: 18,
-          department: "营销部",
-          post: "员工",
-          time: 300,
-          salary: 20,
-        },
-        {
-          id: "27465",
-          name: "李小骏",
-          sex: "女",
-          age: 23,
-          department: "技术部",
-          post: "经理",
-          time: 1150,
-          salary: 100,
-        },
-      ],
+      //列表内容
+      tableData: [],
       //控制弹出框
       dialogTableVisible: false,
       //弹出框表单数据
       dialogForm: {},
+      //被点击员工的工号
+      clickID: null,
     };
   },
+  async created() {
+    try {
+      const result = await getStaffInfoList();
+      this.tableData = result;
+    } catch (error) {
+      console.log(error);
+    }
+  },
   methods: {
+    //确认修改
+    async confirmUpdate() {
+      try {
+        //利用解构删除id和time属性
+        const { id, time, ...obj } = this.dialogForm;
+        const result = await updateStaffInfo({
+          oldID: this.clickID,
+          newID: id,
+          ...obj,
+        });
+        this.$message({
+          message: "修改成功！",
+          type: "success",
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.dialogTableVisible = false;
+      }
+    },
     resetSexFilter() {
       this.$refs.filterTable.clearFilter("sex");
     },
@@ -312,6 +220,7 @@ export default {
       }
     },
     alterInfo(value) {
+      this.clickID = value.id;
       this.dialogForm = value;
       this.dialogTableVisible = true;
     },

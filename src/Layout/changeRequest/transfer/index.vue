@@ -2,7 +2,7 @@
   <div class="main">
     <div class="title">部门调动申请</div>
     <el-divider></el-divider>
-    <el-form ref="form" :model="form" label-width="80px">
+    <el-form ref="form" :model="form" label-width="80px" :rules="transferRules">
       <el-form-item label="姓名" required>
         <el-col :span="8">
           <el-input v-model="form.name"></el-input>
@@ -36,15 +36,15 @@
           <el-option label="人事部" value="renshi"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="目标部门">
+      <el-form-item label="目标部门" prop="aimDepartment">
         <el-select v-model="form.aimDepartment" placeholder="请选择部门">
-          <el-option label="技术部" value="jishu"></el-option>
-          <el-option label="营销部" value="yinxiao"></el-option>
-          <el-option label="财务部" value="caiwu"></el-option>
-          <el-option label="人事部" value="renshi"></el-option>
+          <el-option label="技术部" value="技术部"></el-option>
+          <el-option label="营销部" value="营销部"></el-option>
+          <el-option label="财务部" value="财务部"></el-option>
+          <el-option label="人事部" value="人事部"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="申请理由" required>
+      <el-form-item label="申请理由" prop="reason">
         <el-input
           type="textarea"
           v-model="form.reason"
@@ -59,23 +59,61 @@
 </template>
 
 <script>
+import { transferRequest, getInfo } from "@/api";
 export default {
   data() {
+    const validateAimDepartment = (rule, value, callback) => {
+      if (this.form.aimDepartment === this.form.nowDepartment) {
+        callback(new Error("目标部门不能和当前部门相同！"));
+      } else {
+        callback();
+      }
+    };
     return {
       //表单数据
-      form: {
-        name: "小骏",
-        sex: "男",
-        age: 18,
-        nowDepartment: "caiwu",
-        post: "经理",
-        id: "990101",
-        aimDepartment: "",
+      form: {},
+      //验证规则
+      transferRules: {
+        aimDepartment: [
+          { required: true, trigger: "blur", message: "目标部门不能为空" },
+          { validator: validateAimDepartment, trigger: "blur" },
+        ],
+        reason: [
+          { required: true, trigger: "blur", message: "申请原因不能为空" },
+        ],
       },
-      //按钮选择
-      //默认为退休
-      labelPosition: "tuixiu",
     };
+  },
+  async created() {
+    const result = await getInfo({ id: this.$store.state.id });
+    result.reason = "";
+    result.nowDepartment = result.department;
+    result.aimDepartment = null;
+    this.form = result;
+  },
+  methods: {
+    onSubmit() {
+      console.log("submit!");
+      this.$refs.form.validate(async (isOk) => {
+        if (isOk) {
+          try {
+            const res = await transferRequest({
+              name: this.form.name,
+              sex: this.form.sex,
+              age: this.form.age,
+              reason: this.form.reason,
+            });
+            this.$message({
+              message: "提交成功",
+              type: "success",
+            });
+            console.log(res);
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      });
+    },
   },
 };
 </script>

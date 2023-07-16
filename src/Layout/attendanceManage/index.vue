@@ -4,7 +4,11 @@
     <div class="header">
       <el-form>
         <el-form-item label="查看日期:" prop="day">
-          <el-input-number v-model="formData.day"></el-input-number>
+          <el-input-number
+            v-model="formData.day"
+            :min="1"
+            :max="31"
+          ></el-input-number>
         </el-form-item>
         <el-form-item label="部门筛选:" prop="department">
           <el-checkbox-group v-model="formData.department">
@@ -12,8 +16,12 @@
             <el-checkbox label="技术部" name="department"></el-checkbox>
             <el-checkbox label="财务部" name="department"></el-checkbox>
             <el-checkbox label="人事部" name="department"></el-checkbox>
-            <el-button type="primary" size="small" class="confirmBtn"
-              >确认</el-button
+            <el-button
+              type="primary"
+              size="small"
+              class="confirmBtn"
+              @click="filterData"
+              >筛选</el-button
             >
           </el-checkbox-group>
         </el-form-item>
@@ -27,6 +35,7 @@
         :data="tableData"
         style="width: 100%"
         max-height="510"
+        :key="Math.random()"
       >
         <el-table-column prop="id" label="工号" sortable width="134">
         </el-table-column>
@@ -115,15 +124,14 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="confirm">确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import { getAttendanceInfo, updateAttendance } from "@/api";
 export default {
   data() {
     return {
@@ -132,139 +140,88 @@ export default {
         department: [], //筛选部门
         day: 1, //指定查看天数
       },
-      tableData: [
-        {
-          id: 990001,
-          name: "大骏马",
-          department: "营销部",
-          post: "经理",
-          workTime: 5, //上班时间
-          overTime: 4, //加班时间
-          absentTime: 1, //旷工时间
-          leaveTime: 2, //请假时间
-        },
-        {
-          id: 990122,
-          name: "小骏马",
-          department: "技术部",
-          post: "员工",
-          workTime: 12, //上班时间
-          overTime: 0, //加班时间
-          absentTime: 0, //旷工时间
-          leaveTime: 0, //请假时间
-        },
-        {
-          id: 990234,
-          name: "老骏马",
-          department: "技术部",
-          post: "经理",
-          workTime: 3, //上班时间
-          overTime: 0, //加班时间
-          absentTime: 5, //旷工时间
-          leaveTime: 0, //请假时间
-        },
-        {
-          id: 990001,
-          name: "中骏马",
-          department: "人事部",
-          post: "员工",
-          workTime: 12, //上班时间
-          overTime: 4, //加班时间
-          absentTime: 3, //旷工时间
-          leaveTime: 1, //请假时间
-        },
-        {
-          id: 990001,
-          name: "迷你骏马",
-          department: "财务部",
-          post: "经理",
-          workTime: 7, //上班时间
-          overTime: 2, //加班时间
-          absentTime: 4, //旷工时间
-          leaveTime: 0, //请假时间
-        },
-        {
-          id: 990001,
-          name: "超大骏马",
-          department: "营销部",
-          post: "员工",
-          workTime: 24, //上班时间
-          overTime: 0, //加班时间
-          absentTime: 1, //旷工时间
-          leaveTime: 2, //请假时间
-        },
-        {
-          id: 990001,
-          name: "中骏马",
-          department: "人事部",
-          post: "员工",
-          workTime: 12, //上班时间
-          overTime: 4, //加班时间
-          absentTime: 3, //旷工时间
-          leaveTime: 1, //请假时间
-        },
-        {
-          id: 990001,
-          name: "迷你骏马",
-          department: "财务部",
-          post: "经理",
-          workTime: 7, //上班时间
-          overTime: 2, //加班时间
-          absentTime: 4, //旷工时间
-          leaveTime: 0, //请假时间
-        },
-        {
-          id: 990001,
-          name: "超大骏马",
-          department: "营销部",
-          post: "员工",
-          workTime: 24, //上班时间
-          overTime: 0, //加班时间
-          absentTime: 1, //旷工时间
-          leaveTime: 2, //请假时间
-        },
-        {
-          id: 990001,
-          name: "中骏马",
-          department: "人事部",
-          post: "员工",
-          workTime: 12, //上班时间
-          overTime: 4, //加班时间
-          absentTime: 3, //旷工时间
-          leaveTime: 1, //请假时间
-        },
-        {
-          id: 990001,
-          name: "迷你骏马",
-          department: "财务部",
-          post: "经理",
-          workTime: 7, //上班时间
-          overTime: 2, //加班时间
-          absentTime: 4, //旷工时间
-          leaveTime: 0, //请假时间
-        },
-        {
-          id: 990001,
-          name: "超大骏马",
-          department: "营销部",
-          post: "员工",
-          workTime: 24, //上班时间
-          overTime: 0, //加班时间
-          absentTime: 1, //旷工时间
-          leaveTime: 2, //请假时间
-        },
-      ],
+      tableData: [],
       //控制弹出框是否显示
       dialogFormVisible: false,
       //弹出框表单数据
       dialogForm: {},
+      //被修改用户的id
+      clickID: null,
     };
   },
   methods: {
     showDetails(value) {
       this.dialogForm = value;
+      this.clickID = value.id;
       this.dialogFormVisible = true;
     },
+    async filterData() {
+      try {
+        let obj = {
+          department: ["营销部", "技术部", "财务部", "人事部"],
+          day: this.formData.day,
+        };
+        if (this.formData.department.length === 0) {
+          //如果数组长度为0，默认展示四个部门
+          const result = await getAttendanceInfo(obj);
+          this.tableData = result;
+        } else {
+          const result = await getAttendanceInfo(this.formData);
+          this.tableData = result;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async confirm() {
+      try {
+        await updateAttendance({
+          id: this.clickID,
+          day: this.formData.day,
+          workTime: this.dialogForm.workTime,
+          overTime: this.dialogForm.overTime,
+          absentTime: this.dialogForm.absentTime,
+          leaveTime: this.dialogForm.leaveTime,
+        });
+        this.$message({
+          message: "修改成功！",
+          type: "success",
+        });
+        //重新请求list数据，刷新页面
+        try {
+          let obj = {
+            department: ["营销部", "技术部", "财务部", "人事部"],
+            day: this.formData.day,
+          };
+          if (this.formData.department.length === 0) {
+            //如果数组长度为0，默认展示四个部门
+            const result = await getAttendanceInfo(obj);
+            this.tableData = result;
+          } else {
+            const result = await getAttendanceInfo(this.formData);
+            this.tableData = result;
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.dialogFormVisible = false;
+      }
+    },
+  },
+  async created() {
+    try {
+      const result = await getAttendanceInfo({
+        department: ["营销部", "技术部", "财务部", "人事部"],
+        day: 1,
+      });
+      this.tableData = result;
+    } catch (error) {
+      console.log(error);
+    }
   },
 };
 </script>

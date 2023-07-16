@@ -52,7 +52,10 @@ export const constantRoutes = [
                 path: 'salaryManage',//考勤管理路由
                 component: () => import('@/Layout/salaryManage')
             },
-
+            {
+                path:'systemManage',//系统管理路由
+                component:()=>import('@/Layout/systemManage')
+            }
         ]
     },
     {
