@@ -13,6 +13,12 @@
 到后端文件夹 api_server 中，按住shift键不放，单击鼠标右键，选择打开powershell窗口，输入命令：
 
 ```js
+node install
+```
+
+成功后，执行
+
+```js
 node .\app.js
 ```
 
