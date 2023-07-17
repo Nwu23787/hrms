@@ -34,6 +34,7 @@ exports.login = (req, res) => {
 //获取用户信息接口
 exports.getInfo = (req, res) => {
     console.log('获取用户信息接口响应');
+    console.log(req.user);
     console.log(req.query);
     const data = Mock.mock({
         'code|0-5': 3,
